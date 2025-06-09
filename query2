@@ -68,7 +68,7 @@
       const resultDiv = document.getElementById("result");
       resultDiv.innerHTML = "查詢中，請稍候...";
 
-      fetch("YOUR_WEBHOOK_URL_HERE", {
+      fetch("https://hook.us1.make.com/j22q33davawtsjfb6dhl78hmqb9wel43", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
