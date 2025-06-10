@@ -45,6 +45,7 @@
       border: 1px solid #ddd;
       border-radius: 5px;
       text-align: left;
+      white-space: pre-line;
     }
   </style>
 </head>
@@ -60,12 +61,13 @@
   <script>
     function query() {
       const uid = document.getElementById("uid").value.trim();
+      const resultDiv = document.getElementById("result");
+
       if (!uid) {
         alert("請輸入查詢代碼");
         return;
       }
 
-      const resultDiv = document.getElementById("result");
       resultDiv.innerHTML = "查詢中，請稍候...";
 
       fetch("https://hook.us1.make.com/j22q33davawtsjfb6dhl78hmqb9wel43", {
@@ -75,24 +77,31 @@
         },
         body: JSON.stringify({ uid: uid })
       })
-        .then(response => response.json())
-        .then(data => {
-          if (data.error) {
-            resultDiv.innerHTML = `<span style="color:red;">${data.error}</span>`;
-          } else {
-            resultDiv.innerHTML = `
-              <b>查詢結果：</b><br>
-              姓名：${data.name}<br>
-              年度：${data.year}<br>
-              類別：${data.type}<br>
-              <pre>委員建議：\n${data.suggestion}</pre>
-            `;
-          }
-        })
-        .catch(err => {
-          resultDiv.innerHTML = "查詢失敗，請稍後再試。";
-          console.error(err);
-        });
+      .then(response => response.text())
+      .then(text => {
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error("回傳格式錯誤：" + text);
+        }
+
+        if (data.error) {
+          resultDiv.innerHTML = `<span style="color:red;">${data.error}</span>`;
+        } else {
+          resultDiv.innerHTML = `
+            <b>查詢結果：</b><br>
+            姓名：${data.name}<br>
+            年度：${data.year}<br>
+            類別：${data.type}<br>
+            委員建議：\n${data.suggestion}
+          `;
+        }
+      })
+      .catch(err => {
+        resultDiv.innerHTML = "查詢失敗，請稍後再試。";
+        console.error("查詢錯誤：", err);
+      });
     }
   </script>
 </body>
