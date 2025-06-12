@@ -13,8 +13,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      padding: 20px 0;
+      height: 100vh;
     }
     .container {
       background-color: #fff;
@@ -28,87 +27,50 @@
     .container h2 {
       font-size: 24px;
       margin-bottom: 10px;
-      color: #333;
     }
     .container p.description {
       font-size: 14px;
       color: #444;
       background-color: #eaf6ff;
-      padding: 15px;
+      padding: 10px;
       border-radius: 8px;
-      margin-bottom: 25px;
-      line-height: 1.5;
-      text-align: justify;
-    }
-    .search-section {
       margin-bottom: 20px;
     }
     input[type="text"] {
       width: 100%;
-      padding: 15px;
+      padding: 12px;
       font-size: 16px;
-      border: 2px solid #e1e5e9;
-      border-radius: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
       box-sizing: border-box;
-      transition: border-color 0.3s ease;
-    }
-    input[type="text"]:focus {
-      outline: none;
-      border-color: #667eea;
     }
     input[type="button"] {
       width: 100%;
-      padding: 15px;
+      padding: 12px;
       font-size: 16px;
       background: linear-gradient(to right, #667eea, #764ba2);
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
       margin-top: 15px;
-      transition: all 0.3s ease;
-      font-weight: 500;
     }
     input[type="button"]:hover {
       background: linear-gradient(to right, #5a67d8, #6b46c1);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
     #result {
-      margin-top: 25px;
+      margin-top: 20px;
       background-color: #fefefe;
-      padding: 20px;
+      padding: 15px;
       border: 1px solid #ddd;
-      border-radius: 10px;
+      border-radius: 5px;
       text-align: left;
       white-space: pre-line;
-      line-height: 1.6;
-      display: none;
-    }
-    #result.show {
-      display: block;
-      animation: fadeIn 0.5s ease-in;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .loading {
-      color: #667eea;
-      font-weight: 500;
-    }
-    .error {
-      color: #e53e3e;
-    }
-    .success {
-      color: #38a169;
     }
     @media screen and (max-width: 480px) {
       .container {
         padding: 30px 20px;
-      }
-      input[type="text"], input[type="button"] {
-        padding: 12px;
       }
     }
   </style>
@@ -117,34 +79,25 @@
   <div class="container">
     <h2>📋 期初工作坊委員意見查詢系統</h2>
     <p class="description">
-      <strong>使用說明：</strong><br>
-      請輸入查詢代碼進行查詢，格式為「入案年份 + 身分證末碼」<br>
-      <strong>範例：</strong>114Y12345<br>
-      <em>※ 此為示範介面，實際使用需連接 Google 文件</em>
+      <strong>說明：</strong>請輸入入案年份(中華民國年)與身分證末碼組合為一組格式 (例如：114Y12345)，查詢期初工作坊委員意見。此為示範介面，實際使用需連接 Google 文件。
     </p>
-    
-    <div class="search-section">
-      <input type="text" id="uid" placeholder="請輸入查詢代碼 (例：114Y12345)" />
-      <input type="button" value="🔍 開始查詢" onclick="query()" />
-    </div>
-    
+    <input type="text" id="uid" placeholder="請輸入查詢代碼 (例：114Y12345)" />
+    <input type="button" value="🔍 查詢資料" onclick="query()" />
     <div id="result"></div>
   </div>
-  
+
   <script>
     function query() {
       const uid = document.getElementById("uid").value.trim();
       const resultDiv = document.getElementById("result");
-      
+
       if (!uid) {
         alert("請輸入查詢代碼");
         return;
       }
-      
-      // 顯示載入狀態
-      resultDiv.className = "show loading";
-      resultDiv.innerHTML = "🔍 查詢中，請稍候...";
-      
+
+      resultDiv.innerHTML = "查詢中，請稍候...";
+
       fetch("https://hook.us1.make.com/j22q33davawtsjfb6dhl78hmqb9wel43", {
         method: "POST",
         headers: {
@@ -155,44 +108,18 @@
       })
         .then(response => response.text())
         .then(text => {
-          let data;
-          try {
-            data = JSON.parse(text);
-          } catch (e) {
-            resultDiv.className = "show error";
-            resultDiv.innerHTML = `❌ 回傳格式錯誤，請聯絡管理者\n\n錯誤詳情：\n${text}`;
+          if (!text.includes("姓名：")) {
+            resultDiv.innerHTML = "查詢失敗，請稍後再試。";
             return;
           }
-          
-          if (data.error) {
-            resultDiv.className = "show error";
-            resultDiv.innerHTML = `❌ ${data.error}`;
-          } else {
-            resultDiv.className = "show success";
-            resultDiv.innerHTML = `✅ <strong>查詢成功</strong>
 
-📝 <strong>基本資料：</strong>
-姓名：${data.name}
-年度：${data.year}
-類別：${data.type}
-
-💬 <strong>委員建議：</strong>
-${data.suggestion}`;
-          }
+          resultDiv.innerHTML = text;
         })
         .catch(err => {
-          resultDiv.className = "show error";
-          resultDiv.innerHTML = "❌ 查詢失敗，請檢查網路連線或稍後再試";
+          resultDiv.innerHTML = "查詢失敗，請稍後再試。";
           console.error("查詢錯誤：", err);
         });
     }
-    
-    // 支援 Enter 鍵查詢
-    document.getElementById("uid").addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        query();
-      }
-    });
   </script>
 </body>
 </html>
