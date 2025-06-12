@@ -6,37 +6,57 @@
   <style>
     body {
       font-family: "Microsoft JhengHei", sans-serif;
-      background-color: #f4f4f4;
-      padding: 30px;
-      text-align: center;
+      background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
     .container {
       background-color: #fff;
+      border-radius: 16px;
+      padding: 40px 30px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      max-width: 450px;
+      width: 100%;
+      text-align: center;
+    }
+    .container h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .container p.description {
+      font-size: 14px;
+      color: #444;
+      background-color: #eaf6ff;
+      padding: 10px;
       border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      max-width: 600px;
-      margin: auto;
+      margin-bottom: 20px;
     }
     input[type="text"] {
-      width: 80%;
-      padding: 10px;
+      width: 100%;
+      padding: 12px;
       font-size: 16px;
-      margin-bottom: 10px;
+      margin: 10px 0;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 8px;
+      box-sizing: border-box;
     }
     input[type="button"] {
-      padding: 10px 20px;
+      width: 100%;
+      padding: 12px;
       font-size: 16px;
-      background-color: #007BFF;
+      background: linear-gradient(to right, #667eea, #764ba2);
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
+      margin-top: 15px;
     }
     input[type="button"]:hover {
-      background-color: #0056b3;
+      background: linear-gradient(to right, #5a67d8, #6b46c1);
     }
     #result {
       margin-top: 20px;
@@ -51,23 +71,28 @@
 </head>
 <body>
   <div class="container">
-    <h2>114年期初工作坊 青年查詢系統</h2>
-    <p>請輸入「入選年度+Y+身分證字號後5碼」（例如：112Y12345）</p>
-    <input type="text" id="uid" placeholder="請輸入查詢代碼" />
-    <input type="button" value="查詢" onclick="query()" />
+    <h2>📋 期初工作坊委員意見查詢系統</h2>
+    <p class="description">
+      <strong>說明：</strong>請輸入入案年份(中華民國年)和身分證字號搜尋期初工作坊委員意見。此為示範介面，實際使用需連接Google文件。
+    </p>
+    <input type="text" id="year" placeholder="請輸入入案年份 (例: 112)" />
+    <input type="text" id="idnum" placeholder="請輸入身分證字號 (例: A120734759)" />
+    <input type="button" value="🔍 查詢資料" onclick="query()" />
     <div id="result"></div>
   </div>
 
   <script>
     function query() {
-      const uid = document.getElementById("uid").value.trim();
+      const year = document.getElementById("year").value.trim();
+      const idnum = document.getElementById("idnum").value.trim();
       const resultDiv = document.getElementById("result");
 
-      if (!uid) {
-        alert("請輸入查詢代碼");
+      if (!year || !idnum) {
+        alert("請完整輸入入案年份與身分證字號");
         return;
       }
 
+      const uid = `${year}Y${idnum.slice(-5)}`;
       resultDiv.innerHTML = "查詢中，請稍候...";
 
       fetch("https://hook.us1.make.com/j22q33davawtsjfb6dhl78hmqb9wel43", {
@@ -78,32 +103,32 @@
         },
         body: JSON.stringify({ uid: uid })
       })
-      .then(response => response.text())
-      .then(text => {
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          resultDiv.innerHTML = `<span style="color:red;">回傳格式錯誤，請聯絡管理者。</span><br><code>${text}</code>`;
-          return;
-        }
+        .then(response => response.text())
+        .then(text => {
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            resultDiv.innerHTML = `<span style="color:red;">回傳格式錯誤，請聯絡管理者。</span><br><code>${text}</code>`;
+            return;
+          }
 
-        if (data.error) {
-          resultDiv.innerHTML = `<span style="color:red;">${data.error}</span>`;
-        } else {
-          resultDiv.innerHTML = `
-            <b>查詢結果：</b><br>
-            姓名：${data.name}<br>
-            年度：${data.year}<br>
-            類別：${data.type}<br><br>
-            委員建議：\n${data.suggestion}
-          `;
-        }
-      })
-      .catch(err => {
-        resultDiv.innerHTML = "查詢失敗，請稍後再試。";
-        console.error("查詢錯誤：", err);
-      });
+          if (data.error) {
+            resultDiv.innerHTML = `<span style="color:red;">${data.error}</span>`;
+          } else {
+            resultDiv.innerHTML = `
+              <b>查詢結果：</b><br>
+              姓名：${data.name}<br>
+              年度：${data.year}<br>
+              類別：${data.type}<br><br>
+              委員建議：\n${data.suggestion}
+            `;
+          }
+        })
+        .catch(err => {
+          resultDiv.innerHTML = "查詢失敗，請稍後再試。";
+          console.error("查詢錯誤：", err);
+        });
     }
   </script>
 </body>
