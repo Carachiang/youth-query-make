@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>114年期初工作坊 青年查詢系統</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: "Microsoft JhengHei", sans-serif;
@@ -20,7 +21,7 @@
       padding: 40px 30px;
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
       max-width: 450px;
-      width: 100%;
+      width: 90%;
       text-align: center;
     }
     .container h2 {
@@ -67,32 +68,34 @@
       text-align: left;
       white-space: pre-line;
     }
+    @media screen and (max-width: 480px) {
+      .container {
+        padding: 30px 20px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>📋 期初工作坊委員意見查詢系統</h2>
     <p class="description">
-      <strong>說明：</strong>請輸入入案年份(中華民國年)和身分證字號搜尋期初工作坊委員意見。此為示範介面，實際使用需連接Google文件。
+      <strong>說明：</strong>請輸入入案年份(中華民國年)與身分證末碼組合為一組格式 (例如：114Y12345)，查詢期初工作坊委員意見。此為示範介面，實際使用需連接 Google 文件。
     </p>
-    <input type="text" id="year" placeholder="請輸入入案年份 (例: 112)" />
-    <input type="text" id="idnum" placeholder="請輸入身分證字號 (例: A120734759)" />
+    <input type="text" id="uid" placeholder="請輸入查詢代碼 (例：114Y12345)" />
     <input type="button" value="🔍 查詢資料" onclick="query()" />
     <div id="result"></div>
   </div>
 
   <script>
     function query() {
-      const year = document.getElementById("year").value.trim();
-      const idnum = document.getElementById("idnum").value.trim();
+      const uid = document.getElementById("uid").value.trim();
       const resultDiv = document.getElementById("result");
 
-      if (!year || !idnum) {
-        alert("請完整輸入入案年份與身分證字號");
+      if (!uid) {
+        alert("請輸入查詢代碼");
         return;
       }
 
-      const uid = `${year}Y${idnum.slice(-5)}`;
       resultDiv.innerHTML = "查詢中，請稍候...";
 
       fetch("https://hook.us1.make.com/j22q33davawtsjfb6dhl78hmqb9wel43", {
