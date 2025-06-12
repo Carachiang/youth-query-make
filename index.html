@@ -35,6 +35,7 @@
       padding: 10px;
       border-radius: 8px;
       margin-bottom: 20px;
+      text-align: justify;
     }
     input[type="text"] {
       width: 100%;
@@ -85,26 +86,22 @@
     <input type="button" value="🔍 查詢資料" onclick="query()" />
     <div id="result"></div>
   </div>
-
   <script>
     function query() {
       const uid = document.getElementById("uid").value.trim();
       const resultDiv = document.getElementById("result");
-
       if (!uid) {
         alert("請輸入查詢代碼");
         return;
       }
-
       resultDiv.innerHTML = "查詢中，請稍候...";
-
       fetch("https://hook.us1.make.com/j22q33davawtsjfb6dhl78hmqb9wel43", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Accept": "text/plain"
         },
-        body: JSON.stringify({ uid: uid })
+        body: JSON.stringify({ uid: uid.toUpperCase() })
       })
         .then(response => response.text())
         .then(text => {
@@ -112,7 +109,6 @@
             resultDiv.innerHTML = "查詢失敗，請稍後再試。";
             return;
           }
-
           resultDiv.innerHTML = text;
         })
         .catch(err => {
